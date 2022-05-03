@@ -337,3 +337,20 @@ res=results(dds_re,contrast=c('conds',cond3,cond2))
 res$Gene.name = res@rownames
 write.xlsx(res,file='./data/DEseq_results_NASH_F0-F1vscontrol.xlsx')
 ```
+
+```{r}
+library(dplyr)
+# PCA analysis
+vsd <- vst(dds, blind = FALSE)
+head(assay(vsd), 3)
+pcadata = plotPCA(vsd,intgroup=c("conds"), returnData = TRUE)
+percentVar = round(100 * attr(pcadata, "percentVar")) 
+
+pcadata_p = ggplot(pcadata, aes(x = PC1, y = PC2, color = factor(conds))) + 
+  geom_point(size =3, aes(fill=factor(conds),shape=factor(conds))) + 
+  scale_shape_manual(values=c(16,18,17,15,14,13)) + 
+  xlab(paste0("PC1: ", percentVar[1], "% variance")) + ylab(paste0("PC2: ", percentVar[2], "% variance")) + 
+  theme(axis.text.x = element_blank(), axis.title = element_text(size = 16), legend.text = element_text(size = 12)) +
+  theme_bw()
+ggsave(pcadata_p, filename = "./Figures/00-pca_group_withoutntext.pdf", height = 3.5, width = 5)
+```
